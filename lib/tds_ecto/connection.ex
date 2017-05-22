@@ -343,10 +343,21 @@ if Code.ensure_loaded?(Tds.Connection) do
     end
 
     defp offset(%Query{offset: nil}, _sources), do: nil
+
+    # Hack!
+    # Support offset and limit in SQL Server 2008 ¬¬
+    # Original function below:
+    # defp offset(%Query{offset: %QueryExpr{expr: offset_expr}, limit: %QueryExpr{expr: limit_expr}} = query, sources) do
+    #   "OFFSET " <> expr(offset_expr, sources, query) <> " ROW " <>
+    #   "FETCH NEXT " <> expr(limit_expr, sources, query) <> " ROWS ONLY"
+    # end
+
+    # Hack!
+    # Support offset and limit in SQL Server 2008 ¬¬
     defp offset(%Query{offset: %QueryExpr{expr: offset_expr}, limit: %QueryExpr{expr: limit_expr}} = query, sources) do
-      "OFFSET " <> expr(offset_expr, sources, query) <> " ROW " <>
-      "FETCH NEXT " <> expr(limit_expr, sources, query) <> " ROWS ONLY"
+      "Seq BETWEEN (" <> expr(offset_expr, sources, query) <> " + 1) AND (" <> expr(limit_expr, sources, query) <> " + " <> expr(offset_expr, sources, query) <> ")"
     end
+
     defp offset(%Query{offset: _} = query, _sources) do
       error!(query, "You must provide a limit while using an offset")
     end
@@ -828,11 +839,40 @@ if Code.ensure_loaded?(Tds.Connection) do
     defp quote_name(name),
       do: "[#{name}]"
 
-    defp assemble(list) do
+    # Hack!
+    # Support offset and limit in SQL Server 2008 ¬¬
+    defp assemble([select, from, join, where, group_by, having, order_by, nil] = list),
+      do: assemble_without_offset(list)
+
+    # Hack!
+    # Support offset and limit in SQL Server 2008 ¬¬
+    defp assemble([select, from, join, where, group_by, having, order_by, offset] = list),
+      do: assemble_with_offset(list)
+
+    # Hack!
+    # Support offset and limit in SQL Server 2008 ¬¬
+    # Original function name: assemble
+    defp assemble_without_offset(list) do
       list
       |> List.flatten
       |> Enum.filter(&(&1 != nil))
       |> Enum.join(" ")
+    end
+
+    # Hack!
+    # Support offset and limit in SQL Server 2008
+    defp assemble_with_offset([select, from, nil, nil, nil, nil, order_by, offset]) do
+      select_no_table(select) <> " FROM (" <> select <> " ,ROW_NUMBER() OVER (" <> order_by <> ") AS Seq " <> from <> ")t WHERE " <> offset
+    end
+
+    # Hack!
+    # Support offset and limit in SQL Server 2008
+    defp assemble_with_offset([select, from, nil, where, nil, nil, order_by, offset]) do
+      select_no_table(select) <> " FROM (" <> select <> " ,ROW_NUMBER() OVER (" <> order_by <> ") AS Seq " <> from <> " " <> where <> ")t WHERE " <> offset
+    end
+
+    defp select_no_table(select) do
+      Regex.replace(~r/(h0.\[[A-Za-z_]+\])/, select, fn x -> tl(String.split(x, ".")) end)
     end
 
     defp escape_string(value) when is_binary(value) do
