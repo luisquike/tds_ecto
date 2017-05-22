@@ -1,4 +1,7 @@
 # v1.0.6 (v1.0.2)
+* Add support for SQL Server 2008 OFFSET function
+
+# v1.0.6 (v1.0.2)
 * Integrated upstream changes
 * Add default expression to alter tables too.
 
