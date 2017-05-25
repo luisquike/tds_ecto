@@ -1,3 +1,6 @@
+# v1.0.8 (v1.0.2)
+* Add support for JOINS with OFFSET function
+
 # v1.0.7 (v1.0.2)
 * Add support for SQL Server 2008 OFFSET function
 
