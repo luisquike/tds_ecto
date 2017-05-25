@@ -871,6 +871,12 @@ if Code.ensure_loaded?(Tds.Connection) do
       select_no_table(select) <> " FROM (" <> select <> " ,ROW_NUMBER() OVER (" <> order_by <> ") AS Seq " <> from <> " " <> where <> ")t WHERE " <> offset
     end
 
+    # Hack!
+    # Support offset and limit in SQL Server 2008
+    defp assemble_with_offset([select, from, join, where, group_by, nil, order_by, offset]) do
+      select_no_table(select) <> " FROM (" <> select <> " ,ROW_NUMBER() OVER (" <> order_by <> ") AS Seq " <> from <> " " <> join <> " " <> where <> ")t WHERE " <> offset
+    end
+
     defp select_no_table(select) do
       Regex.replace(~r/(h0.\[[A-Za-z_]+\])/, select, fn x -> tl(String.split(x, ".")) end)
     end
