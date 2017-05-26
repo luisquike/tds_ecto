@@ -841,12 +841,12 @@ if Code.ensure_loaded?(Tds.Connection) do
 
     # Hack!
     # Support offset and limit in SQL Server 2008 ¬¬
-    defp assemble([select, from, join, where, group_by, having, order_by, nil] = list),
+    defp assemble([_select, _from, _join, _where, _group_by, _having, _order_by, nil] = list),
       do: assemble_without_offset(list)
 
     # Hack!
     # Support offset and limit in SQL Server 2008 ¬¬
-    defp assemble([select, from, join, where, group_by, having, order_by, offset] = list),
+    defp assemble([_select, _from, _join, _where, _group_by, _having, _order_by, _offset] = list),
       do: assemble_with_offset(list)
 
     # Hack!
@@ -873,7 +873,7 @@ if Code.ensure_loaded?(Tds.Connection) do
 
     # Hack!
     # Support offset and limit in SQL Server 2008
-    defp assemble_with_offset([select, from, join, where, group_by, nil, order_by, offset]) do
+    defp assemble_with_offset([select, from, join, where, _group_by, nil, order_by, offset]) do
       select_no_table(select) <> " FROM (" <> select <> " ,ROW_NUMBER() OVER (" <> order_by <> ") AS Seq " <> from <> " " <> join <> " " <> where <> ")t WHERE " <> offset
     end
 
