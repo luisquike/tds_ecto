@@ -1,3 +1,6 @@
+# v1.0.9 (v1.0.2)
+* Clear warnings
+
 # v1.0.8 (v1.0.2)
 * Add support for JOINS with OFFSET function
 
