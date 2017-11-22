@@ -878,7 +878,7 @@ if Code.ensure_loaded?(Tds.Connection) do
     end
 
     defp select_no_table(select) do
-      Regex.replace(~r/(h0.\[[A-Za-z_]+\])/, select, fn x -> tl(String.split(x, ".")) end)
+      Regex.replace(~r/(.\d\.\[[A-Za-z_]+\])/, select, fn x -> tl(String.split(x, ".")) end)
     end
 
     defp escape_string(value) when is_binary(value) do
