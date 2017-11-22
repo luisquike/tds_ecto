@@ -1,3 +1,6 @@
+# v1.0.10 (v1.0.2)
+* Fix ecto paginate
+
 # v1.0.9 (v1.0.2)
 * Clear warnings
 
