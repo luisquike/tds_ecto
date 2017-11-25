@@ -1,3 +1,6 @@
+# v1.0.11 (v1.0.2)
+* Fix assemble function when offset is an empty string
+
 # v1.0.10 (v1.0.2)
 * Fix ecto paginate
 
