@@ -846,8 +846,17 @@ if Code.ensure_loaded?(Tds.Connection) do
 
     # Hack!
     # Support offset and limit in SQL Server 2008 ¬¬
+    defp assemble([_select, _from, _join, _where, _group_by, _having, _order_by, ""] = list),
+      do: assemble_without_offset(list)
+
+    # Hack!
+    # Support offset and limit in SQL Server 2008 ¬¬
     defp assemble([_select, _from, _join, _where, _group_by, _having, _order_by, _offset] = list),
       do: assemble_with_offset(list)
+
+    # Hack!
+    # Support offset and limit in SQL Server 2008 ¬¬
+    defp assemble(list), do: assemble_without_offset(list)
 
     # Hack!
     # Support offset and limit in SQL Server 2008 ¬¬
